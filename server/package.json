@@ -1,0 +1,47 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A test server to work on user auth",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "serverStart": "node server.js",
+    "devStart": "nodemon server.js",
+    "app": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dougis/UserAuth.git"
+  },
+  "keywords": [
+    "learning",
+    "mern",
+    "auth"
+  ],
+  "author": "Doug Hubbard",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dougis/UserAuth/issues"
+  },
+  "homepage": "https://github.com/dougis/UserAuth#readme",
+  "proxy": "http://localhost:3000",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.0",
+    "config": "^3.3.9",
+    "dotenv-safe": "^8.2.0",
+    "express": "^4.18.2",
+    "is-empty": "^1.2.0",
+    "jsonwebtoken": "^9.0.1",
+    "mongoose": "^7.4.1",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "validator": "^13.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
