@@ -1,20 +1,21 @@
 require('dotenv-safe').config();
 
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require("body-parser");
 
 
 const connectDB = require('./config/db');
 
 const app = express();
-// Bodyparser middleware
+// Middleware
 app.use(
     bodyParser.urlencoded({
       extended: false
     })
   );
-  app.use(bodyParser.json());
-
+app.use(bodyParser.json());
+app.use(cors());
 // Connect Database
 connectDB();
 
