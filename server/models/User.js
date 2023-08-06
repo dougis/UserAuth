@@ -5,6 +5,7 @@ const UserSchema = new Schema({
   loginId: {
     type: String,
     required: true,
+    minLength: process.env.USER_ID_MIN_LENGTH,
   },
   fullName: {
     type: String,
@@ -17,6 +18,7 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
+    minLength: process.env.PASSWORD_MIN_LENGTH,
   },
   date: {
     type: Date,

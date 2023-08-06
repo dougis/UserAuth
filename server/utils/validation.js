@@ -14,9 +14,15 @@ exports.validateUserSignup = (data) => {
   // login id
   if (
     Validator.isEmpty(data.loginId) ||
-    !Validator.isLength(data.loginId, { min: 4, max: 100 })
+    !Validator.isLength(data.loginId, {
+      min: process.env.USER_ID_MIN_LENGTH,
+      max: 100,
+    })
   ) {
-    errors.loginId = "Login ID is required and must be 4 or more characters";
+    errors.loginId =
+      "Login ID is required and must be " +
+      process.env.USER_ID_MIN_LENGTH +
+      " or more characters";
   }
   // Email checks
   if (Validator.isEmpty(data.email)) {
@@ -27,10 +33,15 @@ exports.validateUserSignup = (data) => {
   // Password checks
   if (
     Validator.isEmpty(data.password) ||
-    !Validator.isLength(data.password, { min: 8, max: 100 })
+    !Validator.isLength(data.password, {
+      min: process.env.PASSWORD_MIN_LENGTH,
+      max: 100,
+    })
   ) {
     errors.password =
-      "Password field is required and must be 8 or more characters";
+      "Password field is required and must be " +
+      process.env.PASSWORD_MIN_LENGTH +
+      " or more characters";
   }
   if (!Validator.equals(data.password, data.passwordVerification)) {
     errors.passwordVerification = "Passwords do not match";
