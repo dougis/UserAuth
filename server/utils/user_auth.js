@@ -18,16 +18,23 @@ exports.createUser = (data) => {
 exports.userLogin = (data) => {
   const { errors, isValid } = validateLoginInput(data);
   if (!isValid) {
-    return res.status(400).json(errors);
+    return {
+      errors,
+      isValid,
+      null,
+    };
   }
   const user = loginIdInUse(data.loginId);
   // if either the user doesn't exist OR the password doesn't match, return an error
+  let authErrors = {};
   if (!user || !validateUserPassword(user, data.password)) {
-    let authErrors = {};
     authErrors.credentials = "Invalid login credentials";
-    return res.status(400).json(errors);
   }
-  // if we get here we have a valid login
+  return {
+    authErrors,
+    isValid: isEmpty(authErrors),
+    user,
+  };
 };
 // for use within this class only, abstracted away by exposed methods
 createJWT = (loginId, userId, duration) => {
