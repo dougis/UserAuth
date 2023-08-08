@@ -5,17 +5,31 @@ const User = require("../models/User");
 
 // this ONLY creates a user, all validation must be performed before calling this method
 exports.createUser = (data) => {
+  const { errors, isValid } = validateUserSignup(data);
+  if (!isValid) {
+    return {
+      errors,
+      isValid,
+      null,
+    };
+  }  
+  let createErrors = {};
+
   var newUser = new User({
     loginId: data.loginId,
     fullName: data.fullName,
     email: data.email,
     password: hashUserPassword(data.password),
   });
-  newUser.save().catch((err) => console.log(err));
-  return newUser;
+  newUser.save().catch((err) => createErrors.creation = err;);
+    return {
+    createErrors,
+    isValid: isEmpty(createErrors),
+    newUser,
+  };
 };
 
-exports.userLogin = (data) => {
+exports.confirmUserLogin = (data) => {
   const { errors, isValid } = validateLoginInput(data);
   if (!isValid) {
     return {
@@ -36,6 +50,28 @@ exports.userLogin = (data) => {
     user,
   };
 };
+
+// assumes all auth done and uses the passed in user to log in and set the JWT token
+exports.createLoginTokenAndLogin = (user) => {
+  let access_token = createJWT(user.loginId, user._id, 3600);
+  jwt
+    .verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        res.status(500).json({ errors: err });
+      }
+      if (decoded) {
+        return res.status(200).json({
+          success: true,
+          token: access_token,
+          message: user,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ errors: err });
+    });
+};
+
 // for use within this class only, abstracted away by exposed methods
 createJWT = (loginId, userId, duration) => {
   const payload = {
