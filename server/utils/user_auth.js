@@ -2,10 +2,12 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const User = require("../models/User");
+const validation = require("../utils/validation");
+module.exports = {createUser, confirmUserLogin, createLoginTokenAndLogin};
 
 // this ONLY creates a user, all validation must be performed before calling this method
-exports.createUser = (data) => {
-  const { errors, isValid } = validateUserSignup(data);
+createUser = (data) => {
+  const { errors, isValid } = validation.validateUserSignup(data);
   if (!isValid) {
     return {
       errors,
@@ -29,8 +31,8 @@ exports.createUser = (data) => {
   };
 };
 
-exports.confirmUserLogin = (data) => {
-  const { errors, isValid } = validateLoginInput(data);
+confirmUserLogin = (data) => {
+  const { errors, isValid } = validation.validateLoginInput(data);
   if (!isValid) {
     return {
       errors,
@@ -38,10 +40,10 @@ exports.confirmUserLogin = (data) => {
       null,
     };
   }
-  const user = loginIdInUse(data.loginId);
+  const user = validation.loginIdInUse(data.loginId);
   // if either the user doesn't exist OR the password doesn't match, return an error
   let authErrors = {};
-  if (!user || !validateUserPassword(user, data.password)) {
+  if (!user || !confirmUserPassword(user, data.password)) {
     authErrors.credentials = "Invalid login credentials";
   }
   return {
@@ -52,7 +54,7 @@ exports.confirmUserLogin = (data) => {
 };
 
 // assumes all auth done and uses the passed in user to log in and set the JWT token
-exports.createLoginTokenAndLogin = (user) => {
+createLoginTokenAndLogin = (user) => {
   let access_token = createJWT(user.loginId, user._id, 3600);
   jwt
     .verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
@@ -95,6 +97,6 @@ hashUserPassword = (newPasswordString) => {
   return hash;
 };
 
-validateUserPassword = (user, suppliedPassword) => {
+confirmUserPassword = (user, suppliedPassword) => {
   return bcrypt.compare(suppliedPassword, user.password);
 };

@@ -1,22 +1,21 @@
-const User = require("../models/User");
-const { createUser } = require("../utils/user_auth");
-const { confirmUserLogin } = require("../utils/user_auth");
-const { createLoginTokenAndLogin } = require("../utils/user_auth");
+const userAuth = require("../utils/user_auth");
 
-exports.signup = (req, res, next) => {
-  const { errors, isValid, user } = createUser(req.body);
+module.exports = {this.signup, this.signin};
+
+signup = (req, res, next) => {
+  const { errors, isValid, user } = userAuth.createUser(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
   }
   // if we get here then the registration worked, sign them in
-  createLoginTokenAndLogin(user);
+  userAuth.createLoginTokenAndLogin(user);
 };
 
-exports.signin = (req, res) => {
-  const { errors, isValid, user } = confirmUserLogin(req.body);
+signin = (req, res) => {
+  const { errors, isValid, user } = userAuth.confirmUserLogin(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
   }
   // if we get here we have a valid login
-  createLoginTokenAndLogin(user);
+  userAuth.createLoginTokenAndLogin(user);
 };

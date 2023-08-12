@@ -1,7 +1,13 @@
 const Validator = require("validator");
 const isEmpty = require("is-empty");
+module.exports = {
+  validateUserSignup,
+  validateLoginInput,
+  loginIdInUse,
+  emailInUse,
+};
 
-exports.validateUserSignup = (data) => {
+validateUserSignup = (data) => {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.email = !isEmpty(data.email) ? data.email : "";
@@ -61,7 +67,7 @@ exports.validateUserSignup = (data) => {
   };
 };
 
-exports.validateLoginInput = (data) => {
+validateLoginInput = (data) => {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.loginId = !isEmpty(data.loginId) ? data.loginId : "";
@@ -80,7 +86,7 @@ exports.validateLoginInput = (data) => {
   };
 };
 
-exports.loginIdInUse = (loginId) => {
+loginIdInUse = (loginId) => {
   User.findOne({ loginId: loginId })
     .then((user) => {
       return user;
@@ -90,7 +96,7 @@ exports.loginIdInUse = (loginId) => {
     });
 };
 
-exports.emailInUse = (email) => {
+emailInUse = (email) => {
   User.findOne({ email: email })
     .then((user) => {
       return user;
