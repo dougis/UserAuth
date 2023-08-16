@@ -1,10 +1,15 @@
 const Validator = require("validator");
 const isEmpty = require("is-empty");
-module.exports = {
-  validateUserSignup,
-  validateLoginInput,
-  loginIdInUse,
-  emailInUse,
+
+
+emailInUse = (email) => {
+  User.findOne({ email: email })
+    .then((user) => {
+      return user;
+    })
+    .catch((error) => {
+      console.log("Error", error);
+    });
 };
 
 validateUserSignup = (data) => {
@@ -96,12 +101,10 @@ loginIdInUse = (loginId) => {
     });
 };
 
-emailInUse = (email) => {
-  User.findOne({ email: email })
-    .then((user) => {
-      return user;
-    })
-    .catch((error) => {
-      console.log("Error", error);
-    });
+
+module.exports = {
+  validateUserSignup,
+  validateLoginInput,
+  loginIdInUse,
+  emailInUse,
 };

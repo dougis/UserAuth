@@ -4,7 +4,7 @@
   "description": "A test server to work on user auth",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "serverStart": "node server.js",
@@ -44,6 +44,7 @@
     "validator": "^13.9.0"
   },
   "devDependencies": {
+    "jest": "^29.6.2",
     "nodemon": "^3.0.1"
   }
 }
