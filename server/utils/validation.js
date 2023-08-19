@@ -1,18 +1,20 @@
 const Validator = require("validator");
 const isEmpty = require("is-empty");
+// const userIdMinLength = process.env.USER_ID_MIN_LENGTH;
+// const passwordMinLength = process.env.PASSWORD_MIN_LENGTH;
+const userIdMinLength = 4;
+const passwordMinLength = 8;
 
-
-emailInUse = (email) => {
-  User.findOne({ email: email })
-    .then((user) => {
-      return user;
-    })
-    .catch((error) => {
-      console.log("Error", error);
-    });
+module.exports = {
+  validateUserSignup,
+  validateLoginInput,
+  loginIdInUse,
+  emailInUse,
+  userIdMinLength,
+  passwordMinLength,
 };
 
-validateUserSignup = (data) => {
+function validateUserSignup (data) {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.email = !isEmpty(data.email) ? data.email : "";
@@ -26,13 +28,13 @@ validateUserSignup = (data) => {
   if (
     Validator.isEmpty(data.loginId) ||
     !Validator.isLength(data.loginId, {
-      min: process.env.USER_ID_MIN_LENGTH,
+      min: userIdMinLength,
       max: 100,
     })
   ) {
     errors.loginId =
       "Login ID is required and must be " +
-      process.env.USER_ID_MIN_LENGTH +
+      userIdMinLength +
       " or more characters";
   }
   // Email checks
@@ -45,13 +47,13 @@ validateUserSignup = (data) => {
   if (
     Validator.isEmpty(data.password) ||
     !Validator.isLength(data.password, {
-      min: process.env.PASSWORD_MIN_LENGTH,
+      min: passwordMinLength,
       max: 100,
     })
   ) {
     errors.password =
       "Password field is required and must be " +
-      process.env.PASSWORD_MIN_LENGTH +
+      passwordMinLength +
       " or more characters";
   }
   if (!Validator.equals(data.password, data.passwordVerification)) {
@@ -72,7 +74,7 @@ validateUserSignup = (data) => {
   };
 };
 
-validateLoginInput = (data) => {
+function validateLoginInput (data) {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.loginId = !isEmpty(data.loginId) ? data.loginId : "";
@@ -91,7 +93,17 @@ validateLoginInput = (data) => {
   };
 };
 
-loginIdInUse = (loginId) => {
+function emailInUse (email) {
+  User.findOne({ email: email })
+    .then((user) => {
+      return user;
+    })
+    .catch((error) => {
+      console.log("Error", error);
+    });
+};
+
+function loginIdInUse (loginId) {
   User.findOne({ loginId: loginId })
     .then((user) => {
       return user;
@@ -101,10 +113,3 @@ loginIdInUse = (loginId) => {
     });
 };
 
-
-module.exports = {
-  validateUserSignup,
-  validateLoginInput,
-  loginIdInUse,
-  emailInUse,
-};

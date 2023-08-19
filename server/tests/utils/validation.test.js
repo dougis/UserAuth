@@ -6,6 +6,8 @@ const {
   validateLoginInput,
   loginIdInUse,
   emailInUse,
+  userIdMinLength,
+  passwordMinLength,
 } = require("../../utils/validation");
 
 describe("validateUserSignup", () => {
@@ -36,13 +38,31 @@ describe("validateUserSignup", () => {
   it("should return an error if loginId is empty", () => {
     data.loginId = "";
     const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.loginId, "Login ID is required and must be " + process.env.USER_ID_MIN_LENGTH + " or more characters");
+    assert.strictEqual(
+      result.errors.loginId,
+      "Login ID is required and must be " +
+        userIdMinLength +
+        " or more characters"
+    );
   });
 
   it("should return an error if loginId is shorter than USER_ID_MIN_LENGTH", () => {
     data.loginId = "abc";
-    const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.loginId, "Login ID is required and must be " + process.env.USER_ID_MIN_LENGTH + " or more characters");
+    const { errors, isValid } = validateUserSignup(data);
+    assert.strictEqual(isValid, false);
+    expect(errors).toEqual(
+      // 1
+      expect.arrayContaining([
+        // 2
+        expect.objectContaining({
+          // 3
+          type:
+            "Login ID is required and must be " +
+            userIdMinLength +
+            " or more characters", // 4
+        }),
+      ])
+    );
   });
 
   it("should return an error if email is empty", () => {
@@ -60,19 +80,42 @@ describe("validateUserSignup", () => {
   it("should return an error if password is empty", () => {
     data.password = "";
     const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.password, "Password field is required and must be " + process.env.PASSWORD_MIN_LENGTH + " or more characters");
+    assert.strictEqual(
+      result.errors.password,
+      "Password field is required and must be " +
+        passwordMinLength +
+        " or more characters"
+    );
   });
 
-  it("should return an error if password is shorter than PASSWORD_MIN_LENGTH", () => {
+  it("should return an error if password is shorter than " + passwordMinLength, () => {
     data.password = "abc";
-    const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.password, "Password field is required and must be " + process.env.PASSWORD_MIN_LENGTH + " or more characters");
+    const { errors, isValid } = validateUserSignup(data);
+    assert.strictEqual(isValid, false);
+    expect(errors).toEqual(
+      // 1
+        expect.objectContaining({
+          // 3
+          password:
+            "Password field is required and must be " +
+            passwordMinLength +
+            " or more characters", // 4
+        }),
+    );
   });
 
   it("should return an error if passwordVerification does not match password", () => {
     data.passwordVerification = "differentpassword";
-    const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.passwordVerification, "Passwords do not match");
+    const { errors, isValid } = validateUserSignup(data);
+    assert.strictEqual(isValid, false);
+    expect(errors).toEqual(
+      // 1
+      expect.objectContaining({
+          // 3
+          passwordVerification:
+           "Passwords do not match", // 2
+        }),
+    );  
   });
 });
 
@@ -103,4 +146,4 @@ describe("validateLoginInput", () => {
     const result = validateLoginInput(data);
     assert.strictEqual(result.errors.loginId, "Login ID is required");
   });
-}); 
+});
