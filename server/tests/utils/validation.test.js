@@ -12,7 +12,7 @@ const {
 
 describe("validateUserSignup", () => {
   let data;
-
+  let validRequest;
   beforeEach(() => {
     data = {
       email: "test@example.com",
@@ -21,8 +21,8 @@ describe("validateUserSignup", () => {
       loginId: "testlogin",
       fullName: "Test User",
     };
+    validRequest = true;
   });
-
   it("should return an object with errors and isValid properties", () => {
     const result = validateUserSignup(data);
     assert.strictEqual(typeof result, "object");
@@ -37,96 +37,134 @@ describe("validateUserSignup", () => {
 
   it("should return an error if loginId is empty", () => {
     data.loginId = "";
-    const result = validateUserSignup(data);
-    assert.strictEqual(
-      result.errors.loginId,
-      "Login ID is required and must be " +
+    validRequest = false;
+    const expectedErrorObject = {
+      loginId:
+        "Login ID is required and must be " +
         userIdMinLength +
-        " or more characters"
+        " or more characters",
+    };
+    const { errors, isValid } = validateUserSignup(data);
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
     );
   });
 
   it("should return an error if loginId is shorter than USER_ID_MIN_LENGTH", () => {
     data.loginId = "abc";
+    validRequest = false;
+    const expectedErrorObject = {
+      loginId:
+        "Login ID is required and must be " +
+        userIdMinLength +
+        " or more characters",
+    };
     const { errors, isValid } = validateUserSignup(data);
-    assert.strictEqual(isValid, false);
-    expect(errors).toEqual(
-      // 1
-      expect.arrayContaining([
-        // 2
-        expect.objectContaining({
-          // 3
-          type:
-            "Login ID is required and must be " +
-            userIdMinLength +
-            " or more characters", // 4
-        }),
-      ])
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
     );
   });
 
   it("should return an error if email is empty", () => {
     data.email = "";
-    const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.email, "Email field is required");
+    validRequest = false;
+    const expectedErrorObject = {
+      email: "Email field is required",
+    };
+    const { errors, isValid } = validateUserSignup(data);
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
+    );
   });
 
   it("should return an error if email is invalid", () => {
     data.email = "invalidemail";
-    const result = validateUserSignup(data);
-    assert.strictEqual(result.errors.email, "Email is invalid");
+    validRequest = false;
+    const expectedErrorObject = {
+      email: "Email is invalid",
+    };
+    const { errors, isValid } = validateUserSignup(data);
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
+    );
   });
 
   it("should return an error if password is empty", () => {
     data.password = "";
-    const result = validateUserSignup(data);
-    assert.strictEqual(
-      result.errors.password,
-      "Password field is required and must be " +
+    validRequest = false;
+    const expectedErrorObject = {
+      password:
+        "Password field is required and must be " +
         passwordMinLength +
-        " or more characters"
+        " or more characters",
+    };
+    const { errors, isValid } = validateUserSignup(data);
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
     );
   });
 
-  it("should return an error if password is shorter than " + passwordMinLength, () => {
-    data.password = "abc";
-    const { errors, isValid } = validateUserSignup(data);
-    assert.strictEqual(isValid, false);
-    expect(errors).toEqual(
-      // 1
-        expect.objectContaining({
-          // 3
-          password:
-            "Password field is required and must be " +
-            passwordMinLength +
-            " or more characters", // 4
-        }),
-    );
-  });
+  it(
+    "should return an error if password is shorter than " + passwordMinLength,
+    () => {
+      data.password = "abc";
+      validRequest = false;
+      const expectedErrorObject = {
+        password:
+          "Password field is required and must be " +
+          passwordMinLength +
+          " or more characters",
+      };
+      const { errors, isValid } = validateUserSignup(data);
+      compareResultsToExpected(
+        validRequest,
+        expectedErrorObject,
+        isValid,
+        errors
+      );
+    }
+  );
 
   it("should return an error if passwordVerification does not match password", () => {
     data.passwordVerification = "differentpassword";
+    validRequest = false;
+    const expectedErrorObject = {
+      passwordVerification: "Passwords do not match", // 2
+    };
     const { errors, isValid } = validateUserSignup(data);
-    assert.strictEqual(isValid, false);
-    expect(errors).toEqual(
-      // 1
-      expect.objectContaining({
-          // 3
-          passwordVerification:
-           "Passwords do not match", // 2
-        }),
-    );  
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
+    );
   });
 });
 
 describe("validateLoginInput", () => {
   let data;
-
+  let validRequest;
   beforeEach(() => {
     data = {
       loginId: "testlogin",
       password: "password",
     };
+    validRequest = true;
   });
 
   it("should return an object with errors and isValid properties", () => {
@@ -138,12 +176,53 @@ describe("validateLoginInput", () => {
 
   it("should return isValid as true when there are no errors", () => {
     const result = validateLoginInput(data);
-    assert.strictEqual(result.isValid, true);
+    assert.strictEqual(result.isValid, validRequest);
   });
 
   it("should return an error if loginId is empty", () => {
     data.loginId = "";
-    const result = validateLoginInput(data);
-    assert.strictEqual(result.errors.loginId, "Login ID is required");
+    validRequest = false;
+    const expectedErrorObject = {
+      loginId: "Login ID is required",
+    };
+    const { errors, isValid } = validateLoginInput(data);
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
+    );
+  });
+
+  it("should return an error if password is empty", () => {
+    data.password = "";
+    validRequest = false;
+    const expectedErrorObject = {
+      password: "Password field is required",
+    };
+    const { errors, isValid } = validateLoginInput(data);
+    compareResultsToExpected(
+      validRequest,
+      expectedErrorObject,
+      isValid,
+      errors
+    );
   });
 });
+
+// put the expect comparisons into a single spot
+function compareResultsToExpected(
+  expectedValid,
+  expectedErrorObject,
+  returnedValid,
+  returnedErrorObject
+) {
+  assert.strictEqual(returnedValid, expectedValid);
+  // if we don't expect it to be valid, check for the expected error response
+  if (!expectedValid) {
+    expect(returnedErrorObject).toEqual(
+      // 1
+      expect.objectContaining(expectedErrorObject)
+    );
+  }
+}

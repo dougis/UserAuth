@@ -14,7 +14,7 @@ module.exports = {
   passwordMinLength,
 };
 
-function validateUserSignup (data) {
+function validateUserSignup(data) {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.email = !isEmpty(data.email) ? data.email : "";
@@ -55,16 +55,15 @@ function validateUserSignup (data) {
       "Password field is required and must be " +
       passwordMinLength +
       " or more characters";
-  }
-  if (!Validator.equals(data.password, data.passwordVerification)) {
+  } else if (!Validator.equals(data.password, data.passwordVerification)) {
     errors.passwordVerification = "Passwords do not match";
   }
   // only hit the DB if we have clean input so far
   if (isEmpty(errors)) {
-    if (this.loginIdInUse(data.loginId)) {
+    if (loginIdInUse(data.loginId)) {
       errors.loginId = "Login ID is already in use";
     }
-    if (this.emailInUse(data.email)) {
+    if (emailInUse(data.email)) {
       errors.loginId = "Email address is already in use";
     }
   }
@@ -72,16 +71,16 @@ function validateUserSignup (data) {
     errors,
     isValid: isEmpty(errors),
   };
-};
+}
 
-function validateLoginInput (data) {
+function validateLoginInput(data) {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.loginId = !isEmpty(data.loginId) ? data.loginId : "";
   data.password = !isEmpty(data.password) ? data.password : "";
   // Email checks
   if (Validator.isEmpty(data.loginId)) {
-    errors.email = "Login ID is required";
+    errors.loginId = "Login ID is required";
   }
   // Password checks
   if (Validator.isEmpty(data.password)) {
@@ -91,9 +90,9 @@ function validateLoginInput (data) {
     errors,
     isValid: isEmpty(errors),
   };
-};
+}
 
-function emailInUse (email) {
+function emailInUse(email) {
   User.findOne({ email: email })
     .then((user) => {
       return user;
@@ -101,9 +100,9 @@ function emailInUse (email) {
     .catch((error) => {
       console.log("Error", error);
     });
-};
+}
 
-function loginIdInUse (loginId) {
+function loginIdInUse(loginId) {
   User.findOne({ loginId: loginId })
     .then((user) => {
       return user;
@@ -111,5 +110,4 @@ function loginIdInUse (loginId) {
     .catch((error) => {
       console.log("Error", error);
     });
-};
-
+}
