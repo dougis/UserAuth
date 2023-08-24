@@ -1,6 +1,6 @@
 const userAuth = require("../utils/user_auth");
 
-module.exports = {this.signup, this.signin};
+module.exports = { signup, signin };
 
 signup = (req, res, next) => {
   const { errors, isValid, user } = userAuth.createUser(req.body);

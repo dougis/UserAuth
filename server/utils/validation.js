@@ -1,9 +1,11 @@
+require("dotenv-safe").config();
 const Validator = require("validator");
 const isEmpty = require("is-empty");
+const User = require("../models/User");
 // const userIdMinLength = process.env.USER_ID_MIN_LENGTH;
 // const passwordMinLength = process.env.PASSWORD_MIN_LENGTH;
-const userIdMinLength = 4;
-const passwordMinLength = 8;
+const userIdMinLength = process.env.USER_ID_MIN_LENGTH;
+const passwordMinLength = process.env.PASSWORD_MIN_LENGTH;
 
 module.exports = {
   validateUserSignup,
@@ -64,7 +66,7 @@ function validateUserSignup(data) {
       errors.loginId = "Login ID is already in use";
     }
     if (emailInUse(data.email)) {
-      errors.loginId = "Email address is already in use";
+      errors.email = "Email address is already in use";
     }
   }
   return {
@@ -92,22 +94,24 @@ function validateLoginInput(data) {
   };
 }
 
-function emailInUse(email) {
-  User.findOne({ email: email })
-    .then((user) => {
-      return user;
-    })
-    .catch((error) => {
-      console.log("Error", error);
-    });
+async function emailInUse(emailToSeek) {
+  const whichKeyField = "email";
+  return await lookForUser(whichKeyField, emailToSeek);
 }
 
-function loginIdInUse(loginId) {
-  User.findOne({ loginId: loginId })
-    .then((user) => {
-      return user;
-    })
-    .catch((error) => {
-      console.log("Error", error);
-    });
+async function loginIdInUse(loginIdToSeek) {
+  const whichKeyField = "loginId";
+  return await lookForUser(whichKeyField, loginIdToSeek);
+}
+
+// uses a findOne to look for a matching user
+async function lookForUser(whichKeyField, whichValue) {
+  const seekObject = { [whichKeyField]: whichValue };
+  const whichUser = await User.findOne(seekObject);
+  if (whichUser) {
+    return whichUser;
+  } else {
+    // User not found, return false
+    return false;
+  }
 }

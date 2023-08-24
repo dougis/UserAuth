@@ -4,7 +4,7 @@
   "description": "A test server to work on user auth",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage --verbose",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "serverStart": "node server.js",
@@ -44,7 +44,9 @@
     "validator": "^13.9.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.3",
     "jest": "^29.6.2",
+    "mongodb-memory-server": "^8.15.1",
     "nodemon": "^3.0.1"
   }
 }

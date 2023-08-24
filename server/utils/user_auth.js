@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 
 const User = require("../models/User");
 const validation = require("../utils/validation");
+
 module.exports = {createUser, confirmUserLogin, createLoginTokenAndLogin};
 
 // this ONLY creates a user, all validation must be performed before calling this method
@@ -23,7 +24,7 @@ createUser = (data) => {
     email: data.email,
     password: hashUserPassword(data.password),
   });
-  newUser.save().catch((err) => createErrors.creation = err;);
+  newUser.save().catch((err) => createErrors.creation = err);
     return {
     createErrors,
     isValid: isEmpty(createErrors),
