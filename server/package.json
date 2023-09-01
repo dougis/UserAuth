@@ -2,13 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "description": "A test server to work on user auth",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest --coverage --verbose",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "serverStart": "node server.js",
-    "devStart": "nodemon server.js",
+    "server": "node server.js",
+    "dev": "nodemon server.js",
     "app": "nodemon app.js"
   },
   "repository": {
@@ -47,6 +47,7 @@
     "@types/jest": "^29.5.3",
     "jest": "^29.6.2",
     "mongodb-memory-server": "^8.15.1",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "sinon": "^15.2.0"
   }
 }
