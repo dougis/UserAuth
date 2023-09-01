@@ -1,3 +1,4 @@
+require("dotenv-safe").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const isEmpty = require("is-empty");
