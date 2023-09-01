@@ -1,25 +1,26 @@
-require('dotenv-safe').config();
+require("dotenv-safe").config();
 
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 
-
-const connectDB = require('./config/db');
+const connectDB = require("./config/db");
 
 const app = express();
+app.use(helmet());
 // Middleware
 app.use(
-    bodyParser.urlencoded({
-      extended: false
-    })
-  );
+  bodyParser.urlencoded({
+    extended: false,
+  })
+);
 app.use(bodyParser.json());
 app.use(cors());
 // Connect Database
 connectDB();
 
-app.get('/', (req, res) => res.send('Hello world!'));
+app.get("/", (req, res) => res.send("Hello world!"));
 
 const port = process.env.PORT || 8082;
 

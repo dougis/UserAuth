@@ -1,47 +1,52 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+const isEmpty = require("is-empty");
 const User = require("../models/User");
 const validation = require("../utils/validation");
 
-module.exports = {createUser, confirmUserLogin, createLoginTokenAndLogin};
+module.exports = { createUser, confirmUserLogin, createLoginTokenAndLogin };
 
-// this ONLY creates a user, all validation must be performed before calling this method
-createUser = (data) => {
-  const { errors, isValid } = validation.validateUserSignup(data);
+async function createUser(data) {
+  var newUser = null;
+
+  const { errors, isValid } = await validation.validateUserSignup(data);
   if (!isValid) {
     return {
       errors,
       isValid,
-      null,
+      newUser,
     };
-  }  
+  }
   let createErrors = {};
 
-  var newUser = new User({
+  newUser = new User({
     loginId: data.loginId,
     fullName: data.fullName,
     email: data.email,
     password: hashUserPassword(data.password),
   });
-  newUser.save().catch((err) => createErrors.creation = err);
-    return {
+  await newUser.save().catch((err) => (createErrors.creation = err));
+  return {
     createErrors,
     isValid: isEmpty(createErrors),
     newUser,
   };
-};
+}
 
-confirmUserLogin = (data) => {
+async function confirmUserLogin(data) {
+  var user = null;
   const { errors, isValid } = validation.validateLoginInput(data);
   if (!isValid) {
     return {
       errors,
       isValid,
-      null,
+      user,
     };
   }
-  const user = validation.loginIdInUse(data.loginId);
+  const foundUser = await validation.loginIdInUse(data.loginId);
+  if (foundUser) {
+    user = foundUser;
+  }
   // if either the user doesn't exist OR the password doesn't match, return an error
   let authErrors = {};
   if (!user || !confirmUserPassword(user, data.password)) {
@@ -52,10 +57,10 @@ confirmUserLogin = (data) => {
     isValid: isEmpty(authErrors),
     user,
   };
-};
+}
 
 // assumes all auth done and uses the passed in user to log in and set the JWT token
-createLoginTokenAndLogin = (user) => {
+function createLoginTokenAndLogin(user) {
   let access_token = createJWT(user.loginId, user._id, 3600);
   jwt
     .verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
@@ -73,7 +78,7 @@ createLoginTokenAndLogin = (user) => {
     .catch((err) => {
       res.status(500).json({ errors: err });
     });
-};
+}
 
 // for use within this class only, abstracted away by exposed methods
 createJWT = (loginId, userId, duration) => {
@@ -90,12 +95,17 @@ createJWT = (loginId, userId, duration) => {
 // for use within this class only, generates and saves a salt value as well as the hashed password
 hashUserPassword = (newPasswordString) => {
   // Hash password before saving in database
+  let hashValue;
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(newPasswordString, salt, (err, hash) => {
-      if (err) throw err;
+      if (err) {
+        throw err;
+      } else {
+        hashValue = hash;
+      }
     });
   });
-  return hash;
+  return hashValue;
 };
 
 confirmUserPassword = (user, suppliedPassword) => {
