@@ -68,24 +68,24 @@ describe("validateUserSignup", () => {
     };
     validRequest = true;
   });
-  it("should return an object with errors and isValid properties", () => {
-    const result = validateUserSignup(data);
+  it("should return an object with errors and isValid properties", async () => {
+    const result = await validateUserSignup(data);
     assert.strictEqual(typeof result, "object");
     assert.strictEqual(typeof result.errors, "object");
     assert.strictEqual(typeof result.isValid, "boolean");
   });
 
-  it("should return isValid as true when there are no errors", () => {
-    const result = validateUserSignup(data);
+  it("should return isValid as true when there are no errors", async () => {
+    const result = await validateUserSignup(data);
     assert.strictEqual(result.isValid, true);
   });
-  it("should return isValid as true when there are no errors with full name passed as null", () => {
+  it("should return isValid as true when there are no errors with full name passed as null", async () => {
     data.fullName = null;
-    const result = validateUserSignup(data);
+    const result = await validateUserSignup(data);
     assert.strictEqual(result.isValid, true);
   });
 
-  it("should return an error if loginId is empty", () => {
+  it("should return an error if loginId is empty", async () => {
     data.loginId = "";
     validRequest = false;
     const expectedErrorObject = {
@@ -94,7 +94,7 @@ describe("validateUserSignup", () => {
         userIdMinLength +
         " or more characters",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -103,7 +103,7 @@ describe("validateUserSignup", () => {
     );
   });
 
-  it("should return an error if loginId is shorter than USER_ID_MIN_LENGTH", () => {
+  it("should return an error if loginId is shorter than USER_ID_MIN_LENGTH", async () => {
     data.loginId = "abc";
     validRequest = false;
     const expectedErrorObject = {
@@ -112,7 +112,7 @@ describe("validateUserSignup", () => {
         userIdMinLength +
         " or more characters",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -121,13 +121,13 @@ describe("validateUserSignup", () => {
     );
   });
 
-  it("should return an error if email is empty", () => {
+  it("should return an error if email is empty", async () => {
     data.email = "";
     validRequest = false;
     const expectedErrorObject = {
       email: "Email field is required",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -136,13 +136,13 @@ describe("validateUserSignup", () => {
     );
   });
 
-  it("should return an error if email is invalid", () => {
+  it("should return an error if email is invalid", async () => {
     data.email = "invalidemail";
     validRequest = false;
     const expectedErrorObject = {
       email: "Email is invalid",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -151,7 +151,7 @@ describe("validateUserSignup", () => {
     );
   });
 
-  it("should return an error if password is empty", () => {
+  it("should return an error if password is empty", async () => {
     data.password = "";
     validRequest = false;
     const expectedErrorObject = {
@@ -160,7 +160,7 @@ describe("validateUserSignup", () => {
         passwordMinLength +
         " or more characters",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -171,7 +171,7 @@ describe("validateUserSignup", () => {
 
   it(
     "should return an error if password is shorter than " + passwordMinLength,
-    () => {
+    async () => {
       data.password = "abc";
       validRequest = false;
       const expectedErrorObject = {
@@ -180,7 +180,7 @@ describe("validateUserSignup", () => {
           passwordMinLength +
           " or more characters",
       };
-      const { errors, isValid } = validateUserSignup(data);
+      const { errors, isValid } = await validateUserSignup(data);
       compareResultsToExpected(
         validRequest,
         expectedErrorObject,
@@ -190,13 +190,13 @@ describe("validateUserSignup", () => {
     }
   );
 
-  it("should return an error if passwordVerification does not match password", () => {
+  it("should return an error if passwordVerification does not match password", async () => {
     data.passwordVerification = "differentpassword";
     validRequest = false;
     const expectedErrorObject = {
       passwordVerification: "Passwords do not match",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -205,13 +205,13 @@ describe("validateUserSignup", () => {
     );
   });
 
-  it("should return an error if passwordVerification is null", () => {
+  it("should return an error if passwordVerification is null", async () => {
     data.passwordVerification = null;
     validRequest = false;
     const expectedErrorObject = {
       passwordVerification: "Passwords do not match",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -219,13 +219,16 @@ describe("validateUserSignup", () => {
       errors
     );
   });
-  it("should return an error if the email is already in use", () => {
-    data.email = testUser.email;
+  it("should return an error if the email is already in use", async () => {
+    testUser = new User(testUserData);
+    const savedUser = await testUser.save();
+    data.email = savedUser.email;
     validRequest = false;
     const expectedErrorObject = {
       email: "Email address is already in use",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
+    await Promise.resolve();
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -233,13 +236,16 @@ describe("validateUserSignup", () => {
       errors
     );
   });
-  it("should return an error if the loginId is already in use", () => {
-    data.loginId = testUser.loginId;
+  it("should return an error if the loginId is already in use", async () => {
+    testUser = new User(testUserData);
+    const savedUser = await testUser.save();
+    data.loginId = savedUser.loginId;
     validRequest = false;
     const expectedErrorObject = {
       loginId: "Login ID is already in use",
     };
-    const { errors, isValid } = validateUserSignup(data);
+    const { errors, isValid } = await validateUserSignup(data);
+    await Promise.resolve();
     compareResultsToExpected(
       validRequest,
       expectedErrorObject,
@@ -307,7 +313,11 @@ describe("Utility checks, finding existing users", () => {
   it("should find the test user based on email", async () => {
     testUser = new User(testUserData);
     const savedUser = await testUser.save();
-    const foundUser = emailInUse(testUser.email);
+    const emailToSeek = testUser.email;
+    const foundUser = await emailInUse(emailToSeek);
+    // const whichKeyField = "email";
+    // const seekObject = { [whichKeyField]: emailToSeek };
+    // const foundUser = await User.findOne(seekObject);
     assert.strictEqual(typeof foundUser, "object");
     assert.strictEqual(foundUser.loginId, testUser.loginId);
   });

@@ -16,7 +16,7 @@ module.exports = {
   passwordMinLength,
 };
 
-function validateUserSignup(data) {
+async function validateUserSignup(data) {
   let errors = {};
   // Convert empty fields to an empty string so we can use validator functions
   data.email = !isEmpty(data.email) ? data.email : "";
@@ -62,10 +62,13 @@ function validateUserSignup(data) {
   }
   // only hit the DB if we have clean input so far
   if (isEmpty(errors)) {
-    if (loginIdInUse(data.loginId)) {
+    var foundUser = await loginIdInUse(data.loginId);
+    if (foundUser) {
       errors.loginId = "Login ID is already in use";
     }
-    if (emailInUse(data.email)) {
+
+    foundUser = await emailInUse(data.email);
+    if (foundUser) {
       errors.email = "Email address is already in use";
     }
   }
@@ -96,7 +99,9 @@ function validateLoginInput(data) {
 
 async function emailInUse(emailToSeek) {
   const whichKeyField = "email";
-  return await lookForUser(whichKeyField, emailToSeek);
+  const seekObject = { [whichKeyField]: emailToSeek };
+  return await User.findOne(seekObject);
+  // return await lookForUser(whichKeyField, emailToSeek);
 }
 
 async function loginIdInUse(loginIdToSeek) {
